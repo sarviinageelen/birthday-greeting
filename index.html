@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Happy Birthday Poland</title>
+  <style>
+    /* Reset and box-sizing */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html, body {
+      height: 100%;
+      width: 100%;
+    }
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #f0f8ff;
+      font-family: Arial, sans-serif;
+      padding: 1rem;
+      text-align: center;
+    }
+    h1 {
+      font-size: clamp(2rem, 6vw, 5rem);
+      color: #333;
+      letter-spacing: 0.05em;
+      line-height: 1.2;
+      white-space: nowrap;
+    }
+    h1 span {
+      opacity: 0;
+      display: inline-block;
+      transform: translateY(10px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    /* Spacer for word gaps */
+    h1 span.spacer {
+      opacity: 1;
+      transform: none;
+      width: 1rem;
+      /* no animation for spaces */
+    }
+    h1 span.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <h1 id="birthday"></h1>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const text = 'Happy Birthday Poland!';
+      const container = document.getElementById('birthday');
+      text.split('').forEach((char, i) => {
+        const span = document.createElement('span');
+        if (char === ' ') {
+          span.classList.add('spacer');
+          // empty content, spacer width handles gap
+        } else {
+          span.textContent = char;
+        }
+        container.appendChild(span);
+        // Animate letters only
+        if (!span.classList.contains('spacer')) {
+          setTimeout(() => span.classList.add('visible'), i * 80);
+        }
+      });
+    });
+  </script>
+</body>
+</html>
