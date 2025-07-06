@@ -6,24 +6,25 @@
     <title>Happy Birthday!</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400&display=swap" rel="stylesheet">
+    <!-- Swapped to more elegant, classic fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Lato:wght@300;400&display=swap" rel="stylesheet">
     <style>
         /* ------------------- */
-        /* --- CSS Variables & Setup --- */
+        /* --- CSS Variables & Setup (Vibrant Pink Theme) --- */
         /* ------------------- */
         :root {
-            --font-greeting: 'Inter', sans-serif;
-            --font-sans: 'Inter', sans-serif;
+            --font-greeting: 'Cormorant Garamond', serif;
+            --font-sans: 'Lato', sans-serif;
 
-            --color-bg-start: #f0a3ab;
-            --color-bg-end: #e899a2;
-            --color-text: #ffffff;
-            --color-particle: rgba(255, 255, 255, 0.7);
-
-            --scroll-height: 400vh;
-            
-            /* Mobile breakpoints */
-            --mobile-width: 768px;
+            /* New palette based on user request #f0a3ab */
+            --color-bg-start: #f2b4bb;   /* A slightly lighter tint for the gradient */
+            --color-bg-end: #f0a3ab;     /* The requested vibrant pink */
+            --color-text: #ffffff;       /* Crisp white for high contrast and a clean look */
+            --color-text-light: rgba(255, 255, 255, 0.8); /* Softer white for secondary text */
+            --color-particle: rgba(255, 255, 255, 0.5);
+            --color-progress-indicator: rgba(255, 255, 255, 0.35);
+            --color-progress-active: #ffffff;
+            --color-focus-ring: #ffffff;
         }
 
         * {
@@ -40,157 +41,105 @@
             font-family: var(--font-sans);
             background: linear-gradient(135deg, var(--color-bg-start), var(--color-bg-end));
             color: var(--color-text);
-            overflow-x: hidden;
+            overflow: hidden; /* Hide scrollbars as they are no longer needed */
             min-height: 100vh;
+            /* Center the main content vertically and horizontally */
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         /* ------------------- */
-        /* --- Background Particles --- */
+        /* --- Background Canvas --- */
         /* ------------------- */
-        #particles-container {
+        #particles-canvas {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             z-index: -1;
-            overflow: hidden;
             pointer-events: none;
-        }
-
-        .particle {
-            position: absolute;
-            background-color: var(--color-particle);
-            border-radius: 50%;
-            opacity: 0;
-            animation: float 20s infinite ease-in-out;
-            will-change: transform, opacity;
-        }
-
-        @keyframes float {
-            0%, 100% {
-                transform: translateY(0) translateX(0) scale(1);
-                opacity: 0;
-            }
-            50% {
-                transform: translateY(-100px) translateX(50px) scale(1.2);
-                opacity: 1;
-            }
-            75% {
-                transform: translateY(-50px) translateX(-30px) scale(1);
-                opacity: 0.8;
-            }
         }
 
         /* ------------------- */
         /* --- Main Content Layout --- */
         /* ------------------- */
-        .sticky-wrapper {
-            position: sticky;
-            top: 0;
-            height: 100vh;
-            width: 100%;
+        .content-wrapper {
             display: flex;
             justify-content: center;
             align-items: center;
             flex-direction: column;
             text-align: center;
-            z-index: 10;
             padding: 20px;
         }
 
-        .scroll-area {
-            height: var(--scroll-height);
-            width: 100%;
-            position: relative;
-            z-index: 1;
-        }
-
         /* ------------------- */
-        /* --- Greeting Text & Animation --- */
+        /* --- Greeting Text & Animation (Refined) --- */
         /* ------------------- */
         .greeting-container {
             display: flex;
             flex-direction: column;
-            gap: 0.5em;
+            gap: 1em;
             align-items: center;
         }
 
         .greeting-static {
-            font-family: var(--font-greeting);
+            font-family: var(--font-sans);
             font-weight: 300;
-            letter-spacing: 0.03em;
-            font-size: clamp(1.75rem, 7vw, 4rem);
-            white-space: nowrap;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            font-size: clamp(0.8rem, 3vw, 1rem);
+            color: var(--color-text-light);
             opacity: 0;
-            animation: fadeIn 1s forwards;
+            animation: fadeIn 1.5s 0.5s forwards;
         }
 
         .greeting-name {
             font-family: var(--font-greeting);
-            font-weight: 300;
-            letter-spacing: 0.03em;
-            font-size: clamp(1.5rem, 6vw, 3.5rem);
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            font-size: clamp(2.5rem, 10vw, 6rem);
             white-space: nowrap;
             min-height: 1.2em;
+            line-height: 1;
         }
 
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         .char {
             display: inline-block;
             opacity: 0;
             animation-fill-mode: forwards;
-            will-change: transform, opacity, filter;
+            will-change: transform, opacity;
         }
 
-        .char.animate-in {
-            animation-name: reveal-in;
-        }
-
-        .char.animate-out {
-            animation-name: reveal-out;
-        }
+        .char.animate-in { animation-name: reveal-in; }
+        .char.animate-out { animation-name: reveal-out; }
 
         @keyframes reveal-in {
             from {
                 opacity: 0;
-                filter: blur(8px);
-                transform: translateY(10px);
+                transform: translateY(20px);
             }
             to {
                 opacity: 1;
-                filter: blur(0px);
                 transform: translateY(0);
             }
         }
 
         @keyframes reveal-out {
-            from {
-                opacity: 1;
-                filter: blur(0px);
-                transform: translateY(0);
-            }
-            to {
-                opacity: 0;
-                filter: blur(8px);
-                transform: translateY(-10px);
-            }
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-20px); }
         }
 
         /* ------------------- */
-        /* --- Scroll Prompt --- */
+        /* --- UI Controls (Minimalist) --- */
         /* ------------------- */
-        .scroll-prompt {
+        .controls-container {
             position: fixed;
             bottom: 20px;
             left: 50%;
@@ -199,236 +148,284 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 8px;
+            gap: 24px;
+        }
+
+        .nav-controls {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-button {
+            background: transparent;
+            border: none;
+            color: var(--color-text-light);
+            font-family: var(--font-sans);
+            font-size: 0.9rem;
+            padding: 8px;
+            cursor: pointer;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-button:hover {
             opacity: 1;
-            transition: opacity 0.5s ease;
-            font-size: clamp(0.875rem, 4vw, 1rem);
         }
 
-        .scroll-prompt.hidden {
-            opacity: 0;
-            pointer-events: none;
+        .nav-button:focus-visible {
+            outline: 2px solid var(--color-focus-ring);
+            outline-offset: 2px;
+            border-radius: 4px;
+        }
+        
+        #progress-indicator {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        
+        .progress-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: var(--color-progress-indicator);
+            transition: background-color 0.4s ease, transform 0.4s ease;
         }
 
-        .scroll-prompt .arrow {
-            font-size: clamp(1.25rem, 5vw, 1.5rem);
-            animation: bounce 2s infinite ease-in-out;
+        .progress-dot.active {
+            background-color: var(--color-progress-active);
+            transform: scale(1.2);
         }
 
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% {
-                transform: translateY(0);
+        /* ------------------- */
+        /* --- Accessibility: Reduced Motion --- */
+        /* ------------------- */
+        @media (prefers-reduced-motion: reduce) {
+            .char, .greeting-static {
+                animation: none !important;
+                transition: none !important;
             }
-            40% {
-                transform: translateY(-10px);
-            }
-            60% {
-                transform: translateY(-5px);
+            .greeting-static, .char {
+                opacity: 1;
             }
         }
 
-        /* Mobile Responsive Adjustments */
+        /* ------------------- */
+        /* --- Responsive Adjustments --- */
+        /* ------------------- */
         @media (max-width: 768px) {
-            .sticky-wrapper {
-                padding: 10px;
-            }
-
-            .greeting-container {
-                gap: 0.3em;
-            }
-
-            .scroll-prompt {
-                bottom: 10px;
-            }
-        }
-
-        @media (max-height: 500px) {
-            .greeting-static {
-                font-size: clamp(1.5rem, 5vw, 3rem);
-            }
-
-            .greeting-name {
-                font-size: clamp(1.25rem, 4vw, 2.5rem);
-            }
+            .content-wrapper { padding: 10px; }
+            .controls-container { bottom: 15px; gap: 20px; }
         }
     </style>
 </head>
 <body>
-    <div id="particles-container" aria-hidden="true"></div>
+    <canvas id="particles-canvas" aria-hidden="true"></canvas>
 
-    <header class="sticky-wrapper">
+    <main class="content-wrapper">
         <div class="greeting-container">
-            <h1 class="greeting-static" aria-live="polite">Happy Birthday</h1>
-            <div class="greeting-name" id="name-text" aria-live="polite"></div>
+            <h1 class="greeting-static">Happy Birthday</h1>
+            <div class="greeting-name" id="name-text" aria-live="polite" aria-atomic="true"></div>
         </div>
-    </header>
+    </main>
 
-    <div class="scroll-prompt" id="scroll-prompt" role="alert" aria-live="polite">
-        <span>Scroll down</span>
-        <span class="arrow" aria-hidden="true">↓</span>
+    <div class="controls-container">
+        <nav class="nav-controls" aria-label="Name switcher">
+            <button id="prev-name" class="nav-button">PREV</button>
+            <button id="next-name" class="nav-button">NEXT</button>
+        </nav>
+
+        <div id="progress-indicator" aria-label="Progress through names"></div>
     </div>
-
-    <div class="scroll-area"></div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // --- 1. CONFIGURATION ---
+            // --- 1. CONFIGURATION (Auto-play) ---
             const config = {
-                names: ['Jolyn', 'Jo', 'Polyn', 'Joly-bee', 'Jojo Pan Mee'],
-                particles: {
-                    count: 20,
-                    minSize: 3,
-                    maxSize: 10,
+                names: ['Jolyn', 'Polyn', 'Polynski', 'Jojo Pan Meow', 'Joly-bee', 'Nyloj', 'Chang Chang Jojo', 'Bojobo'],
+                particles: { 
+                    count: 25,
+                    minSize: 1, 
+                    maxSize: 3,
+                    speed: 0.2
                 },
-                animation: {
-                    duration: 600,
-                    stagger: 40,
-                },
-                scroll: {
-                    throttleDelay: 50 // ms
+                animation: { 
+                    duration: 800, 
+                    stagger: 50,
+                    autoChangeInterval: 4000 // Time in ms before changing to the next name
                 }
             };
 
             // --- 2. DOM ELEMENT REFERENCES ---
             const nameEl = document.getElementById('name-text');
-            const particlesContainer = document.getElementById('particles-container');
-            const scrollPrompt = document.getElementById('scroll-prompt');
-            const scrollArea = document.querySelector('.scroll-area');
+            const prevButton = document.getElementById('prev-name');
+            const nextButton = document.getElementById('next-name');
+            const progressIndicator = document.getElementById('progress-indicator');
+            const canvas = document.getElementById('particles-canvas');
+            const ctx = canvas.getContext('2d');
 
             // --- 3. STATE VARIABLES ---
+            let particles = [];
+            let animationFrameId;
+            let autoChangeTimer;
             let currentNameIndex = -1;
+            let latestRequestedIndex = 0;
             let isAnimating = false;
-            let hasScrolled = false;
 
-            // --- 4. UTILITY FUNCTIONS ---
-            function throttle(func, limit) {
-                let inThrottle;
-                return function(...args) {
-                    if (!inThrottle) {
-                        func.apply(this, args);
-                        inThrottle = true;
-                        setTimeout(() => inThrottle = false, limit);
-                    }
+            // --- 4. CANVAS & PARTICLE LOGIC ---
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+
+            class Particle {
+                constructor() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.size = Math.random() * (config.particles.maxSize - config.particles.minSize) + config.particles.minSize;
+                    this.speedX = (Math.random() * 2 - 1) * config.particles.speed;
+                    this.speedY = (Math.random() * 2 - 1) * config.particles.speed;
+                }
+                update() {
+                    this.x += this.speedX;
+                    this.y += this.speedY;
+                    if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+                    if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+                }
+                draw() {
+                    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--color-particle').trim();
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fill();
                 }
             }
 
-            // --- 5. PARTICLE GENERATION ---
             function createParticles() {
-                try {
-                    for (let i = 0; i < config.particles.count; i++) {
-                        const particle = document.createElement('div');
-                        particle.classList.add('particle');
-                        
-                        const size = Math.random() * (config.particles.maxSize - config.particles.minSize) + config.particles.minSize;
-                        
-                        particle.style.width = `${size}px`;
-                        particle.style.height = `${size}px`;
-                        particle.style.top = `${Math.random() * 100}%`;
-                        particle.style.left = `${Math.random() * 100}%`;
-                        
-                        particle.style.animationDuration = `${Math.random() * 15 + 15}s`;
-                        particle.style.animationDelay = `${Math.random() * 10}s`;
-                        
-                        particlesContainer.appendChild(particle);
-                    }
-                } catch (error) {
-                    console.error('Error creating particles:', error);
+                particles = [];
+                for (let i = 0; i < config.particles.count; i++) {
+                    particles.push(new Particle());
                 }
             }
 
-            // --- 6. TEXT ANIMATION LOGIC ---
-            function animateText(element, text, direction) {
-                return new Promise((resolve, reject) => {
-                    try {
-                        element.innerHTML = '';
-                        const chars = text.split('');
-                        
-                        if (chars.length === 0) {
-                            resolve();
-                            return;
-                        }
+            function animateParticles() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(p => { p.update(); p.draw(); });
+                animationFrameId = requestAnimationFrame(animateParticles);
+            }
 
-                        const animationClass = direction === 'in' ? 'animate-in' : 'animate-out';
-
-                        chars.forEach((char, index) => {
-                            const span = document.createElement('span');
-                            span.className = 'char';
-                            span.textContent = char === ' ' ? '\u00A0' : char;
-                            
-                            span.style.animationDuration = `${config.animation.duration}ms`;
-                            span.style.animationDelay = `${index * config.animation.stagger}ms`;
-                            span.classList.add(animationClass);
-                            
-                            element.appendChild(span);
-                        });
-
-                        const totalDuration = config.animation.duration + (chars.length - 1) * config.animation.stagger;
-                        setTimeout(resolve, totalDuration);
-                    } catch (error) {
-                        reject(error);
-                    }
+            // --- 5. UI UPDATE & ANIMATION LOGIC ---
+            function updateProgressIndicator() {
+                progressIndicator.innerHTML = '';
+                config.names.forEach((_, i) => {
+                    const dot = document.createElement('div');
+                    dot.classList.add('progress-dot');
+                    if (i === currentNameIndex) dot.classList.add('active');
+                    progressIndicator.appendChild(dot);
                 });
             }
 
-            // --- 7. NAME CHANGE LOGIC ---
-            async function changeName(newIndex) {
-                if (isAnimating || newIndex === currentNameIndex) return;
-                
-                try {
-                    isAnimating = true;
+            function animateText(element, text, direction) {
+                return new Promise((resolve) => {
+                    element.innerHTML = '';
+                    const chars = text.split('');
+                    if (chars.length === 0) return resolve();
+                    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                    if (prefersReducedMotion) {
+                        element.textContent = text;
+                        return resolve();
+                    }
+                    const animationClass = direction === 'in' ? 'animate-in' : 'animate-out';
+                    chars.forEach((char, index) => {
+                        const span = document.createElement('span');
+                        span.className = 'char';
+                        span.textContent = char === ' ' ? '\u00A0' : char;
+                        span.style.animationDuration = `${config.animation.duration}ms`;
+                        span.style.animationDelay = `${index * config.animation.stagger}ms`;
+                        span.classList.add(animationClass);
+                        element.appendChild(span);
+                    });
+                    const totalDuration = config.animation.duration + (chars.length - 1) * config.animation.stagger;
+                    setTimeout(resolve, totalDuration);
+                });
+            }
+
+            // --- 6. CORE SEQUENCING LOGIC ---
+            async function changeName() {
+                if (isAnimating) return;
+                isAnimating = true;
+
+                while (currentNameIndex !== latestRequestedIndex) {
+                    const indexToAnimateTo = latestRequestedIndex;
                     const oldName = config.names[currentNameIndex];
-                    const newName = config.names[newIndex];
 
                     if (currentNameIndex !== -1) {
                         await animateText(nameEl, oldName, 'out');
                     }
 
+                    if (indexToAnimateTo !== latestRequestedIndex) {
+                        continue;
+                    }
+
+                    const newName = config.names[indexToAnimateTo];
+                    currentNameIndex = indexToAnimateTo;
+                    updateProgressIndicator();
                     await animateText(nameEl, newName, 'in');
+                }
+                isAnimating = false;
+            }
 
-                    currentNameIndex = newIndex;
-                } catch (error) {
-                    console.error('Error changing name:', error);
-                } finally {
-                    isAnimating = false;
+            // --- 7. EVENT HANDLERS & AUTO-PLAY ---
+            function startAutoChange() {
+                if (autoChangeTimer) clearInterval(autoChangeTimer);
+                
+                const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                if (prefersReducedMotion) return; // Don't auto-play if motion is reduced
+
+                autoChangeTimer = setInterval(() => {
+                    let newIndex = latestRequestedIndex + 1;
+                    if (newIndex >= config.names.length) {
+                        newIndex = 0;
+                    }
+                    latestRequestedIndex = newIndex;
+                    changeName();
+                }, config.animation.autoChangeInterval);
+            }
+
+            function handleNavClick(direction) {
+                let newIndex = currentNameIndex + direction;
+                if (newIndex < 0) newIndex = config.names.length - 1;
+                if (newIndex >= config.names.length) newIndex = 0;
+                
+                if (newIndex !== latestRequestedIndex) {
+                    latestRequestedIndex = newIndex;
+                    changeName();
+                    // Reset the timer when user interacts manually
+                    startAutoChange();
                 }
             }
 
-            // --- 8. SCROLL EVENT HANDLER ---
-            function handleScroll() {
-                if (!hasScrolled) {
-                    hasScrolled = true;
-                    scrollPrompt.classList.add('hidden');
-                }
-
-                const scrollableHeight = scrollArea.offsetHeight - window.innerHeight;
-                if (scrollableHeight <= 0) return;
-
-                const scrollTop = window.scrollY;
-                const scrollPercent = Math.min(Math.max(scrollTop / scrollableHeight, 0), 1);
-
-                const targetIndex = Math.floor(scrollPercent * config.names.length);
-                const finalIndex = Math.min(targetIndex, config.names.length - 1);
-
-                changeName(finalIndex);
-            }
-
-            // --- 9. INITIALIZATION ---
+            // --- 8. INITIALIZATION ---
             function init() {
-                try {
-                    createParticles();
-                    changeName(0);
-                    
-                    // Add throttled scroll listener
-                    const throttledScroll = throttle(handleScroll, config.scroll.throttleDelay);
-                    window.addEventListener('scroll', throttledScroll, { passive: true });
-
-                    // Cleanup on page unload
-                    window.addEventListener('unload', () => {
-                        window.removeEventListener('scroll', throttledScroll);
-                    });
-                } catch (error) {
-                    console.error('Error during initialization:', error);
+                resizeCanvas();
+                createParticles();
+                
+                const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                if (!prefersReducedMotion) {
+                    animationFrameId = requestAnimationFrame(animateParticles);
                 }
+
+                latestRequestedIndex = 0;
+                currentNameIndex = -1;
+                changeName();
+                startAutoChange(); // Start the automatic slideshow
+                
+                prevButton.addEventListener('click', () => handleNavClick(-1));
+                nextButton.addEventListener('click', () => handleNavClick(1));
+                window.addEventListener('resize', () => { resizeCanvas(); createParticles(); });
+                window.addEventListener('unload', () => { 
+                    if (animationFrameId) cancelAnimationFrame(animationFrameId);
+                    if (autoChangeTimer) clearInterval(autoChangeTimer);
+                });
             }
 
             init();
