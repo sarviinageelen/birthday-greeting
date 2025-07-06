@@ -6,25 +6,27 @@
     <title>Happy Birthday!</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- Swapped to more elegant, classic fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Lato:wght@300;400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Inter:wght@300;400&display=swap" rel="stylesheet">
     <style>
         /* ------------------- */
-        /* --- CSS Variables & Setup (Vibrant Pink Theme) --- */
+        /* --- CSS Variables & Setup (Abstract Gradient) --- */
         /* ------------------- */
         :root {
-            --font-greeting: 'Cormorant Garamond', serif;
-            --font-sans: 'Lato', sans-serif;
+            --font-main: 'Cormorant Garamond', serif;
+            --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 
-            /* New palette based on user request #f0a3ab */
-            --color-bg-start: #f2b4bb;   /* A slightly lighter tint for the gradient */
-            --color-bg-end: #f0a3ab;     /* The requested vibrant pink */
-            --color-text: #ffffff;       /* Crisp white for high contrast and a clean look */
-            --color-text-light: rgba(255, 255, 255, 0.8); /* Softer white for secondary text */
-            --color-particle: rgba(255, 255, 255, 0.5);
+            /* Vibrant Pink Theme */
+            --color-bg-start: #f2b4bb;
+            --color-bg-end: #f0a3ab;
+            --color-bg-accent: #c9b4f2; /* New accent color for a richer gradient */
+            --color-text: #ffffff;
+            --color-text-light: rgba(255, 255, 255, 0.8);
             --color-progress-indicator: rgba(255, 255, 255, 0.35);
             --color-progress-active: #ffffff;
             --color-focus-ring: #ffffff;
+
+            /* Custom Easing for a high-end feel */
+            --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
         }
 
         * {
@@ -33,34 +35,32 @@
             box-sizing: border-box;
         }
 
-        html {
-            scroll-behavior: smooth;
-        }
-
+        /* ------------------- */
+        /* --- Abstract Gradient Background Movement --- */
+        /* ------------------- */
         body {
-            font-family: var(--font-sans);
-            background: linear-gradient(135deg, var(--color-bg-start), var(--color-bg-end));
+            font-family: var(--font-ui);
             color: var(--color-text);
-            overflow: hidden; /* Hide scrollbars as they are no longer needed */
+            overflow: hidden;
             min-height: 100vh;
-            /* Center the main content vertically and horizontally */
             display: flex;
             justify-content: center;
             align-items: center;
+
+            /* The gradient now includes the new accent color */
+            background: linear-gradient(135deg, var(--color-bg-start), var(--color-bg-end), var(--color-bg-accent), var(--color-bg-start));
+            background-size: 400% 400%;
+            
+            /* The animation is faster for more frequent, yet still subtle, shifts */
+            animation: animateGradient 25s ease infinite;
         }
 
-        /* ------------------- */
-        /* --- Background Canvas --- */
-        /* ------------------- */
-        #particles-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            pointer-events: none;
+        @keyframes animateGradient {
+            0% { background-position: 0% 0%; }
+            50% { background-position: 100% 100%; }
+            100% { background-position: 0% 0%; }
         }
+
 
         /* ------------------- */
         /* --- Main Content Layout --- */
@@ -75,7 +75,7 @@
         }
 
         /* ------------------- */
-        /* --- Greeting Text & Animation (Refined) --- */
+        /* --- Greeting Text & Animation --- */
         /* ------------------- */
         .greeting-container {
             display: flex;
@@ -85,7 +85,7 @@
         }
 
         .greeting-static {
-            font-family: var(--font-sans);
+            font-family: var(--font-ui);
             font-weight: 300;
             letter-spacing: 0.1em;
             text-transform: uppercase;
@@ -95,32 +95,35 @@
             animation: fadeIn 1.5s 0.5s forwards;
         }
 
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
         .greeting-name {
-            font-family: var(--font-greeting);
+            font-family: var(--font-main);
             font-weight: 600;
             letter-spacing: 0.02em;
             font-size: clamp(2.5rem, 10vw, 6rem);
             white-space: nowrap;
             min-height: 1.2em;
             line-height: 1;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        /* --- Refined "Apple-like" Fade Transition --- */
+        #name-text.animate-out {
+            animation: fade-out-down 0.6s var(--ease-out-quint) forwards;
         }
 
-        .char {
-            display: inline-block;
-            opacity: 0;
-            animation-fill-mode: forwards;
-            will-change: transform, opacity;
+        #name-text.animate-in {
+            animation: fade-in-up 0.6s var(--ease-out-quint) forwards;
         }
 
-        .char.animate-in { animation-name: reveal-in; }
-        .char.animate-out { animation-name: reveal-out; }
-
-        @keyframes reveal-in {
+        @keyframes fade-in-up {
             from {
                 opacity: 0;
                 transform: translateY(20px);
@@ -131,13 +134,20 @@
             }
         }
 
-        @keyframes reveal-out {
-            from { opacity: 1; transform: translateY(0); }
-            to { opacity: 0; transform: translateY(-20px); }
+        @keyframes fade-out-down {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
         }
 
+
         /* ------------------- */
-        /* --- UI Controls (Minimalist) --- */
+        /* --- UI Controls (Polished) --- */
         /* ------------------- */
         .controls-container {
             position: fixed;
@@ -160,16 +170,33 @@
             background: transparent;
             border: none;
             color: var(--color-text-light);
-            font-family: var(--font-sans);
+            font-family: var(--font-ui);
             font-size: 0.9rem;
-            padding: 8px;
+            padding: 8px 4px;
             cursor: pointer;
             opacity: 0.8;
             transition: opacity 0.3s ease;
+            position: relative;
         }
 
         .nav-button:hover {
             opacity: 1;
+        }
+        
+        .nav-button .underline {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background-color: var(--color-text-light);
+            transform: scaleX(0);
+            transform-origin: center;
+            transition: transform 0.4s var(--ease-out-quint);
+        }
+
+        .nav-button:hover .underline {
+            transform: scaleX(1);
         }
 
         .nav-button:focus-visible {
@@ -189,50 +216,54 @@
             height: 6px;
             border-radius: 50%;
             background-color: var(--color-progress-indicator);
-            transition: background-color 0.4s ease, transform 0.4s ease;
+            transform: scale(0.8);
+            transition: background-color 0.5s var(--ease-out-quint), transform 0.5s var(--ease-out-quint);
         }
 
         .progress-dot.active {
             background-color: var(--color-progress-active);
-            transform: scale(1.2);
+            transform: scale(1.1);
         }
 
         /* ------------------- */
         /* --- Accessibility: Reduced Motion --- */
         /* ------------------- */
         @media (prefers-reduced-motion: reduce) {
-            .char, .greeting-static {
+            body {
+                animation: none;
+            }
+            #name-text {
                 animation: none !important;
                 transition: none !important;
             }
-            .greeting-static, .char {
+             .greeting-static {
+                animation: none !important;
+                transition: none !important;
                 opacity: 1;
             }
-        }
-
-        /* ------------------- */
-        /* --- Responsive Adjustments --- */
-        /* ------------------- */
-        @media (max-width: 768px) {
-            .content-wrapper { padding: 10px; }
-            .controls-container { bottom: 15px; gap: 20px; }
         }
     </style>
 </head>
 <body>
-    <canvas id="particles-canvas" aria-hidden="true"></canvas>
-
     <main class="content-wrapper">
         <div class="greeting-container">
             <h1 class="greeting-static">Happy Birthday</h1>
-            <div class="greeting-name" id="name-text" aria-live="polite" aria-atomic="true"></div>
+            <div class="greeting-name">
+                <div id="name-text"></div>
+            </div>
         </div>
     </main>
 
     <div class="controls-container">
         <nav class="nav-controls" aria-label="Name switcher">
-            <button id="prev-name" class="nav-button">PREV</button>
-            <button id="next-name" class="nav-button">NEXT</button>
+            <button id="prev-name" class="nav-button">
+                <span>PREV</span>
+                <span class="underline"></span>
+            </button>
+            <button id="next-name" class="nav-button">
+                <span>NEXT</span>
+                <span class="underline"></span>
+            </button>
         </nav>
 
         <div id="progress-indicator" aria-label="Progress through names"></div>
@@ -240,19 +271,11 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // --- 1. CONFIGURATION (Auto-play) ---
+            // --- 1. CONFIGURATION ---
             const config = {
                 names: ['Jolyn', 'Polyn', 'Polynski', 'Jojo Pan Meow', 'Joly-bee', 'Nyloj', 'Chang Chang Jojo', 'Bojobo'],
-                particles: { 
-                    count: 25,
-                    minSize: 1, 
-                    maxSize: 3,
-                    speed: 0.2
-                },
                 animation: { 
-                    duration: 800, 
-                    stagger: 50,
-                    autoChangeInterval: 4000 // Time in ms before changing to the next name
+                    autoChangeInterval: 4000
                 }
             };
 
@@ -261,59 +284,13 @@
             const prevButton = document.getElementById('prev-name');
             const nextButton = document.getElementById('next-name');
             const progressIndicator = document.getElementById('progress-indicator');
-            const canvas = document.getElementById('particles-canvas');
-            const ctx = canvas.getContext('2d');
 
             // --- 3. STATE VARIABLES ---
-            let particles = [];
-            let animationFrameId;
             let autoChangeTimer;
-            let currentNameIndex = -1;
-            let latestRequestedIndex = 0;
+            let currentNameIndex = 0;
             let isAnimating = false;
 
-            // --- 4. CANVAS & PARTICLE LOGIC ---
-            function resizeCanvas() {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-            }
-
-            class Particle {
-                constructor() {
-                    this.x = Math.random() * canvas.width;
-                    this.y = Math.random() * canvas.height;
-                    this.size = Math.random() * (config.particles.maxSize - config.particles.minSize) + config.particles.minSize;
-                    this.speedX = (Math.random() * 2 - 1) * config.particles.speed;
-                    this.speedY = (Math.random() * 2 - 1) * config.particles.speed;
-                }
-                update() {
-                    this.x += this.speedX;
-                    this.y += this.speedY;
-                    if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
-                    if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
-                }
-                draw() {
-                    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--color-particle').trim();
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-            }
-
-            function createParticles() {
-                particles = [];
-                for (let i = 0; i < config.particles.count; i++) {
-                    particles.push(new Particle());
-                }
-            }
-
-            function animateParticles() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                particles.forEach(p => { p.update(); p.draw(); });
-                animationFrameId = requestAnimationFrame(animateParticles);
-            }
-
-            // --- 5. UI UPDATE & ANIMATION LOGIC ---
+            // --- 4. UI UPDATE ---
             function updateProgressIndicator() {
                 progressIndicator.innerHTML = '';
                 config.names.forEach((_, i) => {
@@ -324,108 +301,67 @@
                 });
             }
 
-            function animateText(element, text, direction) {
-                return new Promise((resolve) => {
-                    element.innerHTML = '';
-                    const chars = text.split('');
-                    if (chars.length === 0) return resolve();
-                    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-                    if (prefersReducedMotion) {
-                        element.textContent = text;
-                        return resolve();
-                    }
-                    const animationClass = direction === 'in' ? 'animate-in' : 'animate-out';
-                    chars.forEach((char, index) => {
-                        const span = document.createElement('span');
-                        span.className = 'char';
-                        span.textContent = char === ' ' ? '\u00A0' : char;
-                        span.style.animationDuration = `${config.animation.duration}ms`;
-                        span.style.animationDelay = `${index * config.animation.stagger}ms`;
-                        span.classList.add(animationClass);
-                        element.appendChild(span);
-                    });
-                    const totalDuration = config.animation.duration + (chars.length - 1) * config.animation.stagger;
-                    setTimeout(resolve, totalDuration);
-                });
-            }
-
-            // --- 6. CORE SEQUENCING LOGIC ---
-            async function changeName() {
-                if (isAnimating) return;
+            // --- 5. CORE ANIMATION LOGIC ---
+            function changeName(newIndex) {
+                if (isAnimating || newIndex === currentNameIndex) return;
                 isAnimating = true;
 
-                while (currentNameIndex !== latestRequestedIndex) {
-                    const indexToAnimateTo = latestRequestedIndex;
-                    const oldName = config.names[currentNameIndex];
+                nameEl.classList.add('animate-out');
 
-                    if (currentNameIndex !== -1) {
-                        await animateText(nameEl, oldName, 'out');
-                    }
+                nameEl.addEventListener('animationend', function onAnimationEnd() {
+                    nameEl.removeEventListener('animationend', onAnimationEnd);
 
-                    if (indexToAnimateTo !== latestRequestedIndex) {
-                        continue;
-                    }
-
-                    const newName = config.names[indexToAnimateTo];
-                    currentNameIndex = indexToAnimateTo;
+                    currentNameIndex = newIndex;
+                    nameEl.textContent = config.names[currentNameIndex];
                     updateProgressIndicator();
-                    await animateText(nameEl, newName, 'in');
-                }
-                isAnimating = false;
+
+                    nameEl.classList.remove('animate-out');
+                    nameEl.classList.add('animate-in');
+                    
+                    nameEl.addEventListener('animationend', function onInAnimationEnd() {
+                        nameEl.removeEventListener('animationend', onInAnimationEnd);
+                        nameEl.classList.remove('animate-in');
+                        isAnimating = false;
+                    }, { once: true });
+
+                }, { once: true });
             }
 
-            // --- 7. EVENT HANDLERS & AUTO-PLAY ---
+            // --- 6. EVENT HANDLERS & AUTO-PLAY ---
             function startAutoChange() {
                 if (autoChangeTimer) clearInterval(autoChangeTimer);
-                
                 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-                if (prefersReducedMotion) return; // Don't auto-play if motion is reduced
+                if (prefersReducedMotion) return;
 
                 autoChangeTimer = setInterval(() => {
-                    let newIndex = latestRequestedIndex + 1;
-                    if (newIndex >= config.names.length) {
-                        newIndex = 0;
-                    }
-                    latestRequestedIndex = newIndex;
-                    changeName();
+                    handleNavClick(1);
                 }, config.animation.autoChangeInterval);
             }
+
+
 
             function handleNavClick(direction) {
                 let newIndex = currentNameIndex + direction;
                 if (newIndex < 0) newIndex = config.names.length - 1;
                 if (newIndex >= config.names.length) newIndex = 0;
                 
-                if (newIndex !== latestRequestedIndex) {
-                    latestRequestedIndex = newIndex;
-                    changeName();
-                    // Reset the timer when user interacts manually
-                    startAutoChange();
-                }
+                changeName(newIndex);
+                startAutoChange();
             }
 
-            // --- 8. INITIALIZATION ---
+            // --- 7. INITIALIZATION ---
             function init() {
-                resizeCanvas();
-                createParticles();
-                
                 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                
+                nameEl.textContent = config.names[currentNameIndex];
+                updateProgressIndicator();
+                
                 if (!prefersReducedMotion) {
-                    animationFrameId = requestAnimationFrame(animateParticles);
+                    startAutoChange();
                 }
-
-                latestRequestedIndex = 0;
-                currentNameIndex = -1;
-                changeName();
-                startAutoChange(); // Start the automatic slideshow
                 
                 prevButton.addEventListener('click', () => handleNavClick(-1));
                 nextButton.addEventListener('click', () => handleNavClick(1));
-                window.addEventListener('resize', () => { resizeCanvas(); createParticles(); });
-                window.addEventListener('unload', () => { 
-                    if (animationFrameId) cancelAnimationFrame(animationFrameId);
-                    if (autoChangeTimer) clearInterval(autoChangeTimer);
-                });
             }
 
             init();
