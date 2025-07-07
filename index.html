@@ -27,6 +27,7 @@
 
             /* Custom Easing for a high-end feel */
             --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+            --animation-duration: 0.6s;
         }
 
         * {
@@ -116,11 +117,11 @@
 
         /* --- Refined "Apple-like" Fade Transition --- */
         #name-text.animate-out {
-            animation: fade-out-down 0.6s var(--ease-out-quint) forwards;
+            animation: fade-out-down var(--animation-duration) var(--ease-out-quint) forwards;
         }
 
         #name-text.animate-in {
-            animation: fade-in-up 0.6s var(--ease-out-quint) forwards;
+            animation: fade-in-up var(--animation-duration) var(--ease-out-quint) forwards;
         }
 
         @keyframes fade-in-up {
@@ -206,11 +207,18 @@
         }
         
         #progress-indicator {
+            /* The main container is now a flex column for sr-text and dots */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px; /* Gap between sr-text (if it were visible) and dots */
+        }
+
+        .progress-dots-container {
             display: flex;
             gap: 10px;
-            justify-content: center;
         }
-        
+
         .progress-dot {
             width: 6px;
             height: 6px;
@@ -223,6 +231,21 @@
         .progress-dot.active {
             background-color: var(--color-progress-active);
             transform: scale(1.1);
+        }
+
+        /* ------------------- */
+        /* --- Accessibility Utilities --- */
+        /* ------------------- */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
         }
 
         /* ------------------- */
@@ -249,7 +272,7 @@
         <div class="greeting-container">
             <h1 class="greeting-static">Happy Birthday</h1>
             <div class="greeting-name">
-                <div id="name-text"></div>
+                <div id="name-text" aria-live="polite" aria-atomic="true"></div>
             </div>
         </div>
     </main>
@@ -266,7 +289,10 @@
             </button>
         </nav>
 
-        <div id="progress-indicator" aria-label="Progress through names"></div>
+        <div id="progress-indicator" role="status" aria-label="Progress through names">
+            <span class="sr-only"></span>
+            <div class="progress-dots-container"></div>
+        </div>
     </div>
 
     <script>
@@ -279,59 +305,76 @@
                 }
             };
 
+            const PREFERS_REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
             // --- 2. DOM ELEMENT REFERENCES ---
             const nameEl = document.getElementById('name-text');
             const prevButton = document.getElementById('prev-name');
             const nextButton = document.getElementById('next-name');
-            const progressIndicator = document.getElementById('progress-indicator');
+            const progressDotsContainer = document.querySelector('.progress-dots-container');
+            const progressSrText = document.querySelector('#progress-indicator .sr-only');
 
             // --- 3. STATE VARIABLES ---
             let autoChangeTimer;
             let currentNameIndex = 0;
             let isAnimating = false;
+            let progressDots = []; // To hold references to the dot elements
 
             // --- 4. UI UPDATE ---
-            function updateProgressIndicator() {
-                progressIndicator.innerHTML = '';
+            function initProgressIndicator() {
+                // Create dots only once
                 config.names.forEach((_, i) => {
                     const dot = document.createElement('div');
                     dot.classList.add('progress-dot');
-                    if (i === currentNameIndex) dot.classList.add('active');
-                    progressIndicator.appendChild(dot);
+                    progressDotsContainer.appendChild(dot);
+                    progressDots.push(dot);
                 });
             }
 
+            function updateProgressIndicator() {
+                progressDots.forEach((dot, i) => {
+                    dot.classList.toggle('active', i === currentNameIndex);
+                });
+                // Update screen reader text
+                const totalNames = config.names.length;
+                progressSrText.textContent = `Name ${currentNameIndex + 1} of ${totalNames}`;
+            }
+
             // --- 5. CORE ANIMATION LOGIC ---
-            function changeName(newIndex) {
+            // Helper function that returns a promise, resolving when an animation ends
+            function waitForAnimation(element) {
+                return new Promise(resolve => {
+                    element.addEventListener('animationend', resolve, { once: true });
+                });
+            }
+
+            async function changeName(newIndex) {
                 if (isAnimating || newIndex === currentNameIndex) return;
                 isAnimating = true;
 
+                // Animate out
                 nameEl.classList.add('animate-out');
+                await waitForAnimation(nameEl);
 
-                nameEl.addEventListener('animationend', function onAnimationEnd() {
-                    nameEl.removeEventListener('animationend', onAnimationEnd);
+                // Update content
+                currentNameIndex = newIndex;
+                nameEl.textContent = config.names[currentNameIndex];
+                updateProgressIndicator();
 
-                    currentNameIndex = newIndex;
-                    nameEl.textContent = config.names[currentNameIndex];
-                    updateProgressIndicator();
+                // Animate in
+                nameEl.classList.remove('animate-out');
+                nameEl.classList.add('animate-in');
+                await waitForAnimation(nameEl);
 
-                    nameEl.classList.remove('animate-out');
-                    nameEl.classList.add('animate-in');
-                    
-                    nameEl.addEventListener('animationend', function onInAnimationEnd() {
-                        nameEl.removeEventListener('animationend', onInAnimationEnd);
-                        nameEl.classList.remove('animate-in');
-                        isAnimating = false;
-                    }, { once: true });
-
-                }, { once: true });
+                // Cleanup
+                nameEl.classList.remove('animate-in');
+                isAnimating = false;
             }
 
             // --- 6. EVENT HANDLERS & AUTO-PLAY ---
             function startAutoChange() {
                 if (autoChangeTimer) clearInterval(autoChangeTimer);
-                const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-                if (prefersReducedMotion) return;
+                if (PREFERS_REDUCED_MOTION) return;
 
                 autoChangeTimer = setInterval(() => {
                     handleNavClick(1);
@@ -341,22 +384,21 @@
 
 
             function handleNavClick(direction) {
-                let newIndex = currentNameIndex + direction;
-                if (newIndex < 0) newIndex = config.names.length - 1;
-                if (newIndex >= config.names.length) newIndex = 0;
-                
+                const totalNames = config.names.length;
+                // Use modulo for clean, wrapping index calculation
+                const newIndex = (currentNameIndex + direction + totalNames) % totalNames;
+
                 changeName(newIndex);
                 startAutoChange();
             }
 
             // --- 7. INITIALIZATION ---
             function init() {
-                const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-                
+                initProgressIndicator();
                 nameEl.textContent = config.names[currentNameIndex];
                 updateProgressIndicator();
                 
-                if (!prefersReducedMotion) {
+                if (!PREFERS_REDUCED_MOTION) {
                     startAutoChange();
                 }
                 
