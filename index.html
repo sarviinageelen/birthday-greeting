@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Inter:wght@300;400&display=swap" rel="stylesheet">
     <style>
         /* ------------------- */
-        /* --- CSS Variables & Setup (Abstract Gradient) --- */
+        /* --- CSS Variables & Setup --- */
         /* ------------------- */
         :root {
             --font-main: 'Cormorant Garamond', serif;
@@ -18,7 +18,7 @@
             /* Vibrant Pink Theme */
             --color-bg-start: #f2b4bb;
             --color-bg-end: #f0a3ab;
-            --color-bg-accent: #c9b4f2; /* New accent color for a richer gradient */
+            --color-bg-accent: #c9b4f2;
             --color-text: #ffffff;
             --color-text-light: rgba(255, 255, 255, 0.8);
             --color-progress-indicator: rgba(255, 255, 255, 0.35);
@@ -37,7 +37,7 @@
         }
 
         /* ------------------- */
-        /* --- Abstract Gradient Background Movement --- */
+        /* --- Animated Gradient Background --- */
         /* ------------------- */
         body {
             font-family: var(--font-ui);
@@ -47,12 +47,8 @@
             display: flex;
             justify-content: center;
             align-items: center;
-
-            /* The gradient now includes the new accent color */
             background: linear-gradient(135deg, var(--color-bg-start), var(--color-bg-end), var(--color-bg-accent), var(--color-bg-start));
             background-size: 400% 400%;
-            
-            /* The animation is faster for more frequent, yet still subtle, shifts */
             animation: animateGradient 25s ease infinite;
         }
 
@@ -61,7 +57,6 @@
             50% { background-position: 100% 100%; }
             100% { background-position: 0% 0%; }
         }
-
 
         /* ------------------- */
         /* --- Main Content Layout --- */
@@ -115,7 +110,7 @@
             align-items: center;
         }
 
-        /* --- Refined "Apple-like" Fade Transition --- */
+        /* --- Name Transition Animations --- */
         #name-text.animate-out {
             animation: fade-out-down var(--animation-duration) var(--ease-out-quint) forwards;
         }
@@ -146,9 +141,8 @@
             }
         }
 
-
         /* ------------------- */
-        /* --- UI Controls (Polished) --- */
+        /* --- UI Controls --- */
         /* ------------------- */
         .controls-container {
             position: fixed;
@@ -207,11 +201,10 @@
         }
         
         #progress-indicator {
-            /* The main container is now a flex column for sr-text and dots */
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 10px; /* Gap between sr-text (if it were visible) and dots */
+            gap: 10px;
         }
 
         .progress-dots-container {
@@ -234,7 +227,7 @@
         }
 
         /* ------------------- */
-        /* --- Accessibility Utilities --- */
+        /* --- Accessibility --- */
         /* ------------------- */
         .sr-only {
             position: absolute;
@@ -248,20 +241,15 @@
             border-width: 0;
         }
 
-        /* ------------------- */
-        /* --- Accessibility: Reduced Motion --- */
-        /* ------------------- */
         @media (prefers-reduced-motion: reduce) {
-            body {
+            body,
+            .greeting-static,
+            #name-text.animate-out,
+            #name-text.animate-in {
                 animation: none;
+                transition: none;
             }
-            #name-text {
-                animation: none !important;
-                transition: none !important;
-            }
-             .greeting-static {
-                animation: none !important;
-                transition: none !important;
+            .greeting-static {
                 opacity: 1;
             }
         }
@@ -322,7 +310,9 @@
 
             // --- 4. UI UPDATE ---
             function initProgressIndicator() {
-                // Create dots only once
+                // Return early if the container doesn't exist
+                if (!progressDotsContainer) return;
+                
                 config.names.forEach((_, i) => {
                     const dot = document.createElement('div');
                     dot.classList.add('progress-dot');
@@ -335,21 +325,28 @@
                 progressDots.forEach((dot, i) => {
                     dot.classList.toggle('active', i === currentNameIndex);
                 });
-                // Update screen reader text
-                const totalNames = config.names.length;
-                progressSrText.textContent = `Name ${currentNameIndex + 1} of ${totalNames}`;
+                
+                // Update screen reader text if the element exists
+                if (progressSrText) {
+                    const totalNames = config.names.length;
+                    progressSrText.textContent = `Name ${currentNameIndex + 1} of ${totalNames}`;
+                }
             }
 
             // --- 5. CORE ANIMATION LOGIC ---
-            // Helper function that returns a promise, resolving when an animation ends
             function waitForAnimation(element) {
                 return new Promise(resolve => {
-                    element.addEventListener('animationend', resolve, { once: true });
+                    // Fallback timer in case animationend doesn't fire
+                    const timeout = setTimeout(() => resolve(), 700); // Slightly longer than animation
+                    element.addEventListener('animationend', () => {
+                        clearTimeout(timeout);
+                        resolve();
+                    }, { once: true });
                 });
             }
 
             async function changeName(newIndex) {
-                if (isAnimating || newIndex === currentNameIndex) return;
+                if (isAnimating || newIndex === currentNameIndex || !nameEl) return;
                 isAnimating = true;
 
                 // Animate out
@@ -381,29 +378,44 @@
                 }, config.animation.autoChangeInterval);
             }
 
-
-
             function handleNavClick(direction) {
                 const totalNames = config.names.length;
                 // Use modulo for clean, wrapping index calculation
                 const newIndex = (currentNameIndex + direction + totalNames) % totalNames;
 
                 changeName(newIndex);
+                // Reset the auto-change timer on manual navigation
                 startAutoChange();
             }
 
             // --- 7. INITIALIZATION ---
             function init() {
+                // Guard against missing name element
+                if (!nameEl) {
+                    console.error("Initialization failed: #name-text element not found.");
+                    return;
+                }
+
                 initProgressIndicator();
                 nameEl.textContent = config.names[currentNameIndex];
                 updateProgressIndicator();
                 
                 if (!PREFERS_REDUCED_MOTION) {
-                    startAutoChange();
+                    // Add initial animation for the first name
+                    nameEl.classList.add('animate-in');
+                    waitForAnimation(nameEl).then(() => {
+                         nameEl.classList.remove('animate-in');
+                         startAutoChange();
+                    });
                 }
                 
-                prevButton.addEventListener('click', () => handleNavClick(-1));
-                nextButton.addEventListener('click', () => handleNavClick(1));
+                // Add event listeners only if buttons exist
+                if (prevButton) {
+                    prevButton.addEventListener('click', () => handleNavClick(-1));
+                }
+                if (nextButton) {
+                    nextButton.addEventListener('click', () => handleNavClick(1));
+                }
             }
 
             init();
@@ -412,6 +424,5 @@
 
     <!-- 100% privacy-first analytics -->
     <script async src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
-    
 </body>
 </html>
